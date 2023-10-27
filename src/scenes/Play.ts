@@ -12,6 +12,9 @@ export default class Play extends Phaser.Scene {
 
   starfield?: Phaser.GameObjects.TileSprite;
   rocket?: Phaser.GameObjects.Image;
+  ship1?: Phaser.GameObjects.Image;
+  ship2?: Phaser.GameObjects.Image;
+  ship3?: Phaser.GameObjects.Image;
 
   movementSpeed = 2;
   isFiring = false;
@@ -46,11 +49,16 @@ export default class Play extends Phaser.Scene {
         "starfield",
       )
       .setOrigin(0, 0);
+      const x_offset = 40;
     
       this.rocket = this.add.image(this.game.config.width as number / 2, this.game.config.height as number - 30, "rocket");
+      this.ship1 = this.add.image(this.game.config.width as number - x_offset, 30, "spaceship");
+      this.ship2 = this.add.image(this.game.config.width as number - x_offset, 70, "spaceship");
+      this.ship3 = this.add.image(this.game.config.width as number - x_offset, 110, "spaceship");
   }
 
   update() {
+    const x_offset = 40;
     this.starfield!.tilePositionX -= 3;
 
     if (this.left!.isDown && !this.isFiring) {
@@ -62,6 +70,22 @@ export default class Play extends Phaser.Scene {
     if (this.fire!.isDown && !this.isFiring) {
       this.isFiring = true;
     }
+    if(this.ship1!.x > -20){
+      this.ship1!.x -= this.movementSpeed;
+    } else {
+      this.ship1!.x = this.game.config.width as number - x_offset;
+    }
+    if(this.ship2!.x > -20){
+      this.ship2!.x -= this.movementSpeed;
+    } else {
+      this.ship2!.x = this.game.config.width as number - x_offset;
+    }
+    if(this.ship3!.x > -20){
+      this.ship3!.x -= this.movementSpeed;
+    } else {
+      this.ship3!.x = this.game.config.width as number - x_offset;
+    }
+
     if (this.isFiring) {
       this.rocket!.y -= this.movementSpeed * 2;
       if (this.rocket!.y < 0) {
