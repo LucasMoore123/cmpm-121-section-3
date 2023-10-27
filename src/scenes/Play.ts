@@ -1,6 +1,9 @@
 import * as Phaser from "phaser";
 
+// Assets taken from: https://nathanaltice.github.io/RocketPatrol/
 import starfieldUrl from "/assets/starfield.png";
+import spaceshipUrl from "/assets/spaceship.png";
+import rocketUrl from "/assets/rocket.png";
 
 export default class Play extends Phaser.Scene {
   fire?: Phaser.Input.Keyboard.Key;
@@ -8,9 +11,10 @@ export default class Play extends Phaser.Scene {
   right?: Phaser.Input.Keyboard.Key;
 
   starfield?: Phaser.GameObjects.TileSprite;
-  spinner?: Phaser.GameObjects.Shape;
+  rocket?: Phaser.GameObjects.Image;
 
-  rotationSpeed = Phaser.Math.PI2 / 1000; // radians per millisecond
+  movementSpeed = 2;
+  isFiring = false;
 
   constructor() {
     super("play");
@@ -18,6 +22,8 @@ export default class Play extends Phaser.Scene {
 
   preload() {
     this.load.image("starfield", starfieldUrl);
+    this.load.image("spaceship", spaceshipUrl);
+    this.load.image("rocket", rocketUrl);
   }
 
   #addKey(
@@ -40,27 +46,28 @@ export default class Play extends Phaser.Scene {
         "starfield",
       )
       .setOrigin(0, 0);
-
-    this.spinner = this.add.rectangle(100, 100, 50, 50, 0xff0000);
+    
+      this.rocket = this.add.image(this.game.config.width as number / 2, this.game.config.height as number - 30, "rocket");
   }
 
-  update(_timeMs: number, delta: number) {
-    this.starfield!.tilePositionX -= 4;
+  update() {
+    this.starfield!.tilePositionX -= 3;
 
-    if (this.left!.isDown) {
-      this.spinner!.rotation -= delta * this.rotationSpeed;
+    if (this.left!.isDown && !this.isFiring) {
+      this.rocket!.x -= this.movementSpeed;
     }
-    if (this.right!.isDown) {
-      this.spinner!.rotation += delta * this.rotationSpeed;
+    if (this.right!.isDown && !this.isFiring) {
+      this.rocket!.x += this.movementSpeed;
     }
-
-    if (this.fire!.isDown) {
-      this.tweens.add({
-        targets: this.spinner,
-        scale: { from: 1.5, to: 1 },
-        duration: 300,
-        ease: Phaser.Math.Easing.Sine.Out,
-      });
+    if (this.fire!.isDown && !this.isFiring) {
+      this.isFiring = true;
+    }
+    if (this.isFiring) {
+      this.rocket!.y -= this.movementSpeed * 2;
+      if (this.rocket!.y < 0) {
+        this.isFiring = false;
+        this.rocket!.y = this.game.config.height as number - 30;
+      }
     }
   }
 }
